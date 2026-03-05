@@ -5,14 +5,16 @@ from model.Locacao import Locacao
 
 
 def main():    
-    print("1. Criação via Factory:")
+    print("Criação via Factory:")
     carro = VeiculoFactory.criar_veiculo('carro', "ABC1234", 150.0, Categoria.ECONOMICO)
     print(f"{carro}\n")
+    motorhome = VeiculoFactory.criar_veiculo('motorhome', "DEF5678", 200.0, Categoria.EXECUTIVO)
+    print(f"{motorhome}\n")
     
     
     print("Cálculo com 3 dias:")
-    data_inicio = datetime.strptime("04-03-2026", '%d-%m-%Y').date()
-    data_fim = datetime.strptime("07-03-2026", '%d-%m-%Y').date()
+    data_inicio = date(2026, 3, 4)
+    data_fim = date(2026, 3, 7)
     locacao = Locacao(carro, data_inicio, data_fim)
     valor = locacao.calcular_valor_locacao()
     print("Taxa diária: R$ 150.00")
@@ -21,11 +23,11 @@ def main():
     
     
     print("Cálculo com devolução em 1 dia:")
-    data_inicio = datetime.strptime("07-03-2026", '%d-%m-%Y').date()
-    data_fim = datetime.strptime("08-03-2026", '%d-%m-%Y').date()
-    locacao = Locacao(carro, data_inicio, data_fim)
+    data_inicio = date(2026, 3, 7)
+    data_fim = date(2026, 3, 8)
+    locacao = Locacao(motorhome, data_inicio, data_fim)
     valor = locacao.calcular_valor_locacao()
-    print(f"Valor total: (1 × 150) + 50 = R$ {valor:.2f}\n")
+    print(f"Valor total: (1 × 200) + 120 = R$ {valor:.2f}\n")
     
 
     print("Tratamento de tipo inválido:")
