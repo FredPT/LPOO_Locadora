@@ -3,3 +3,6 @@ class PlacaInvalidaError(Exception):
 
 class DataInvalidaError(Exception):
     pass
+
+class ExcecaoValorInvalido(Exception):
+    pass
