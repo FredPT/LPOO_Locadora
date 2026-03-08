@@ -19,7 +19,7 @@ def main():
     valor = locacao.calcular_valor_locacao()
     print("Taxa diária: R$ 150.00")
     print("Seguro: R$ 50.00")
-    print(f"Valor total: (3 × 150) + 50 = R$ {valor:.2f}\n")
+    print(f"Valor total: ({(data_fim - data_inicio).days} × {carro.taxa_diaria}) + {carro.valor_seguro} = R$ {valor:.2f}\n")
     
     
     print("Cálculo com devolução no mesmo dia:")
@@ -27,7 +27,9 @@ def main():
     data_fim = date(2026, 3, 8)
     locacao = Locacao(motorhome, data_inicio, data_fim)
     valor = locacao.calcular_valor_locacao()
-    print(f"Valor total: (1 × 200) + 120 = R$ {valor:.2f}\n")
+    dias = (data_fim - data_inicio).days
+    dias_cobrados = 1 if dias == 0 else dias
+    print(f"Valor total: ({dias_cobrados} × {motorhome.taxa_diaria}) + {motorhome.valor_seguro} = R$ {valor:.2f}\n")
        
     
     print("Tratamento de tipo inválido:")
