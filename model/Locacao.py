@@ -11,8 +11,8 @@ class ExcecaoValorInvalido(Exception):
 class Locacao:
     def __init__(self, veiculo: Veiculo, data_inicio: date, data_fim: date):
         
-        if data_inicio >= data_fim:
-            raise DataInvalidaError("Data de início deve ser anterior à data de fim")
+        if data_inicio > data_fim:
+            raise DataInvalidaError("Data de início deve ser anterior ou igual à data de fim")
         
         
         self.veiculo = veiculo

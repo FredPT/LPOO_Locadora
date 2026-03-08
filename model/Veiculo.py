@@ -23,6 +23,8 @@ class Veiculo(ABC):
     
     @taxa_diaria.setter
     def taxa_diaria(self, valor):
+        if valor <= 0:
+            raise ValueError("Taxa diária deve ser um valor positivo")
         self.__taxa_diaria = valor
 
     def validar_placa(self, placa):

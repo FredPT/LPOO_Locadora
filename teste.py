@@ -22,20 +22,28 @@ def main():
     print(f"Valor total: (3 × 150) + 50 = R$ {valor:.2f}\n")
     
     
-    print("Cálculo com devolução em 1 dia:")
-    data_inicio = date(2026, 3, 7)
+    print("Cálculo com devolução no mesmo dia:")
+    data_inicio = date(2026, 3, 8)
     data_fim = date(2026, 3, 8)
     locacao = Locacao(motorhome, data_inicio, data_fim)
     valor = locacao.calcular_valor_locacao()
     print(f"Valor total: (1 × 200) + 120 = R$ {valor:.2f}\n")
+       
     
-
     print("Tratamento de tipo inválido:")
     try:
         VeiculoFactory.criar_veiculo('moto', "ABC1234", 50.0)
     except ValueError as e:
         print(f"Exceção capturada: {e}\n")
-
-
+    
+    
+    print("Validação de taxa diária inválida:")
+    try:
+        carro_invalido = VeiculoFactory.criar_veiculo('carro', "XYZ9999", -10.0, Categoria.ECONOMICO)
+    except ValueError as e:
+        print(f"Exceção capturada: {e}\n")
+    
+        
+        
 if __name__ == "__main__":
     main()
