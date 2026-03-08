@@ -14,8 +14,6 @@ class Locacao:
         if data_inicio >= data_fim:
             raise DataInvalidaError("Data de início deve ser anterior à data de fim")
         
-        if data_inicio < date.today():
-            raise DataInvalidaError("Data de início não pode ser no passado")
         
         self.veiculo = veiculo
         self.data_inicio = data_inicio
