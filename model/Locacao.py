@@ -1,5 +1,6 @@
 from datetime import datetime, date
 from .Veiculo import Veiculo
+from .LocacaoStrategy import CalculoLocacaoStrategy, CalculoPadraoStrategy, CalculoVIPStrategy
 
 
 class DataInvalidaError(Exception):
@@ -9,7 +10,7 @@ class ExcecaoValorInvalido(Exception):
     pass
 
 class Locacao:
-    def __init__(self, veiculo: Veiculo, data_inicio: date, data_fim: date):
+    def __init__(self, veiculo: Veiculo, data_inicio: date, data_fim: date, estrategia: CalculoLocacaoStrategy = CalculoPadraoStrategy()):
         
         if data_inicio > data_fim:
             raise DataInvalidaError("Data de início deve ser anterior ou igual à data de fim")
@@ -18,6 +19,8 @@ class Locacao:
         self.veiculo = veiculo
         self.data_inicio = data_inicio
         self.data_fim = data_fim
+        self.estrategia = estrategia
+
     
     @property
     def veiculo(self):
@@ -55,10 +58,10 @@ class Locacao:
         if dias < 0:
             raise ExcecaoValorInvalido("Número de dias não pode ser negativo")
         
-        diaria = self.veiculo.calcular_diaria()
-        seguro = self.veiculo.valor_seguro
-        
-        valor_total = (diaria * dias) + seguro
+        #diaria = self.veiculo.calcular_diaria()
+        #seguro = self.veiculo.valor_seguro
+        #valor_total = (diaria * dias) + seguro
+        valor_total = self.estrategia.calcular_diarias(self.veiculo, dias)
         
         if valor_total < 0:
             raise ExcecaoValorInvalido("Valor total não pode ser negativo")
