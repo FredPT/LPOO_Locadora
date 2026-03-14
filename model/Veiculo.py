@@ -1,12 +1,14 @@
 from abc import ABC, abstractmethod
 from .Categoria import Categoria
 from .ExcecoesPersonalizadas import PlacaInvalidaError, DataInvalidaError
+from .Estados_Veiculo import DisponivelState
 
 class Veiculo(ABC):
     def __init__(self, placa: str, taxa_diaria: float, categoria: Categoria = Categoria.ECONOMICO):
         self.placa = placa
         self.categoria = categoria
         self.taxa_diaria = taxa_diaria
+        self.estado_atual = DisponivelState(self)
     
     @property
     def placa(self):
@@ -53,6 +55,25 @@ class Veiculo(ABC):
     @abstractmethod
     def calcular_diaria(self):
         pass
+    
+    @property
+    def estado_atual(self):
+        return self._estado_atual
+
+    @estado_atual.setter
+    def estado_atual(self, novo_estado):
+        # Usado pelas classes de estado para mudar o ponteiro do carro
+        self._estado_atual = novo_estado
+        
+    # DELEGAÇÃO:
+    def tentar_alugar(self):
+        self.estado_atual.alugar()
+        
+    def tentar_devolver(self):
+        self.estado_atual.devolver()
+        
+    def reter_na_frota_pra_conserto(self):
+        self.estado_atual.enviar_manutencao()
     
     def __str__(self):
         return f"Veículo: {self.placa} - Categoria: {self.categoria.value} - Taxa: R$ {self.taxa_diaria:.2f}"
