@@ -41,7 +41,7 @@ class Veiculo(ABC):
             elif not placa[4].isalnum():
                 raise PlacaInvalidaError("Placa inválida: o caractere 5 deve ser uma letra ou um número.")
             else:    
-                print(f"Placa '{placa}' válida.")
+                #print(f"Placa '{placa}' válida.")
                 return True 
     
     @property
@@ -75,5 +75,14 @@ class Veiculo(ABC):
     def reter_na_frota_pra_conserto(self):
         self.estado_atual.enviar_manutencao()
     
+    def exibir_dados(self):
+        return (
+            f"Placa: {self.placa}\n"
+            f"Tipo: {self.__class__.__name__}\n"
+            f"Categoria: {self.categoria.value}\n"
+            f"Taxa diária: R$ {self.taxa_diaria:.2f}\n"
+            f"Estado: {getattr(self.estado_atual, '__class__', type(self.estado_atual)).__name__.replace('State', '')}"
+        )
+
     def __str__(self):
         return f"Veículo: {self.placa} - Categoria: {self.categoria.value} - Taxa: R$ {self.taxa_diaria:.2f}"
