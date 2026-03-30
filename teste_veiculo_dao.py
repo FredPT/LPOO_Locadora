@@ -15,4 +15,4 @@ lista_veiculos = dao.listar_todos()
 print(f"Total de veículos cadastrados: {len(lista_veiculos)}")
 
 for veiculo in lista_veiculos:
-    print(f"Placa: {veiculo.placa}, Tipo: {veiculo.__class__.__name__}, Categoria: {veiculo.categoria.name}, Taxa Diária: {veiculo.taxa_diaria}")
+    print(f"Placa: {veiculo.placa}, Tipo: {veiculo.__class__.__name__}, Categoria: {veiculo.categoria}, Taxa Diária: {veiculo.taxa_diaria}")
