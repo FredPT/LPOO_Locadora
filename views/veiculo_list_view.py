@@ -36,16 +36,9 @@ class VeiculoDashboard(tk.Tk):
         for col in colunas:
             self.tree.heading(col, text=col.capitalize())
             self.tree.column(col, width=130, anchor=tk.CENTER)
-            
-        self.tree.column("placa", width=120, anchor=tk.CENTER)
-        self.tree.column("tipo", width=100, anchor=tk.CENTER)
-        self.tree.column("estado", width=120, anchor=tk.CENTER)
 
         self.scroll_y.config(command=self.tree.yview)
         self.scroll_y.pack(side=tk.RIGHT, fill=tk.Y)
-        
-        self.scroll_x.config(command=self.tree.xview)
-        self.scroll_x.pack(side=tk.BOTTOM, fill=tk.X)
         
         self.tree.pack(fill="both", expand=True)
 
@@ -58,17 +51,8 @@ class VeiculoDashboard(tk.Tk):
         self.btn_remover = Button(self.frame_rodape, text="Remover", width=15, command=self.remover_selecionado)
         self.btn_remover.pack(side="left", padx=5)
 
-        self.criar_veiculos_iniciais()
         self.atualizar_tabela()
 
-    def criar_veiculos_iniciais(self):
-        try:
-            v1 = VeiculoFactory.criar_veiculo("carro", "ABC1234", 150.0, Categoria.ECONOMICO)
-            v2 = VeiculoFactory.criar_veiculo("motorhome", "DEF5678", 220.0, Categoria.EXECUTIVO)
-            v3 = VeiculoFactory.criar_veiculo("carro", "GHI9012", 180.0, Categoria.EXECUTIVO)
-            self.veiculos.extend([v1, v2, v3])
-        except Exception as e:
-            messagebox.showerror("Erro inicial", f"Falha ao criar veículos iniciais: {e}")
 
     def atualizar_tabela(self):
         for item in self.tree.get_children():
