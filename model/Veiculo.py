@@ -62,10 +62,8 @@ class Veiculo(ABC):
 
     @estado_atual.setter
     def estado_atual(self, novo_estado):
-        # Usado pelas classes de estado para mudar o ponteiro do carro
         self._estado_atual = novo_estado
         
-    # DELEGAÇÃO:
     def tentar_alugar(self):
         self.estado_atual.alugar()
         
