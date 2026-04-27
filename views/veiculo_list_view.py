@@ -1,159 +1,187 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 import tkinter as tk
-from tkinter import ttk, messagebox, Label, Entry, Button, Frame, Scrollbar
+from tkinter import ttk, messagebox
 
-from model.VeiculoFactory import VeiculoFactory
-from model.Categoria import Categoria
+#from dao import veiculo_dao
+#veiculo_dao = veiculo_dao.VeiculoDAO()
+#lista_veiculos = veiculo_dao.listar_todos()
 
 
-class VeiculoDashboard(tk.Tk):
-    def __init__(self):
-        super().__init__()
+from control.veiculo_controller import VeiculoController
 
-        self.title("Dashboard Locadora - Lista de Veículos Cadastrados")
-        self.geometry("780x520")
+
+## Toda aplicação Tkinter só deve possuir uma única janela principal raiz (tk.Tk()). 
+# Se tentar dar tk.Tk() em outra tela, vai abrir outra instância na memória 
+# e pode dar diversos problemas gráficos e falhas de variáveis.
+
+# No caso do seu projeto da Locadora: As telas herdam de tk.Toplevel (class JanelaCadastroVeiculo(tk.Toplevel):) 
+# porque isso permite tratá-las de um jeito modular (como um "Popup").
+
+## O tk.Toplevel é uma classe do Tkinter usada para criar Janelas Secundárias que rodam 
+# "por cima" de uma tela principal (que é geralmente o tk.Tk()).
+class JanelaListagemVeiculos(tk.Toplevel):
+    def __init__(self, master=None):
+        super().__init__(master)
+        self.title("Veículos Cadastrados")
+        self.geometry("600x400")
         
-        self.veiculos = []
+        self.controller = VeiculoController()
 
-        self.frame_tabela = Frame(self)
-        self.frame_tabela.pack(fill="both", expand=True, padx=10, pady=(10, 5))
+        self.criar_widgets()
+        self.carregar_dados()
+
+    def criar_widgets(self):
+        lbl_titulo = tk.Label(self, text="Veículos Cadastrados", font=("Helvetica", 16, "bold"))
+        lbl_titulo.pack(pady=10)
+
+        # Frame para a Treeview e Scrollbar
+        frame_tree = tk.Frame(self)
+        frame_tree.pack(expand=True, fill="both", padx=20, pady=10)
+
+        # Scrollbar
+        scrollbar = ttk.Scrollbar(frame_tree)
+        scrollbar.pack(side="right", fill="y")
+
+        # Treeview (Tabela)
+        colunas = ("Placa", "Tipo", "Categoria", "Taxa Diária (R$)")
+        self.tree = ttk.Treeview(frame_tree, columns=colunas, show="headings", yscrollcommand=scrollbar.set)
         
-        self.frame_rodape = Frame(self, padx=10, pady=10)
-        self.frame_rodape.pack(fill="x")
-
-        colunas = ("placa", "tipo", "categoria", "taxa", "estado")
-        self.scroll_y = Scrollbar(self.frame_tabela, orient=tk.VERTICAL)
-        self.scroll_x = Scrollbar(self.frame_tabela, orient=tk.HORIZONTAL)
-
-        self.tree = ttk.Treeview(
-            self.frame_tabela,
-            columns=colunas,
-            show="headings",
-            yscrollcommand=self.scroll_y.set,
-            xscrollcommand=self.scroll_x.set,
-            selectmode="browse"
-        )
-
+        # Configurar cabeçalhos e colunas
         for col in colunas:
-            self.tree.heading(col, text=col.capitalize())
-            self.tree.column(col, width=130, anchor=tk.CENTER)
+            self.tree.heading(col, text=col)
+            self.tree.column(col, anchor="center", width=120)
 
-        self.scroll_y.config(command=self.tree.yview)
-        self.scroll_y.pack(side=tk.RIGHT, fill=tk.Y)
+        self.tree.pack(expand=True, fill="both")
+        scrollbar.config(command=self.tree.yview)
+
+        # Frame para os botões de ação
+        frame_botoes = tk.Frame(self)
+        frame_botoes.pack(fill="x", padx=20, pady=5)
+
+        btn_novo = tk.Button(frame_botoes, text="Novo", width=10, command=self.abrir_novo)
+        btn_novo.pack(side="left", padx=5)
+
+        btn_editar = tk.Button(frame_botoes, text="Ver Informações", width=15, command=self.mostrar_info)
+        btn_editar.pack(side="left", padx=5)
+
+        btn_remover = tk.Button(frame_botoes, text="Remover", width=10, command=self.remover_veiculo)
+        btn_remover.pack(side="left", padx=5)
+
+        # Botão Fechar no canto direito
+        btn_fechar = tk.Button(frame_botoes, text="Fechar", width=10, command=self.destroy)
+        btn_fechar.pack(side="right", padx=5)
+
+    def abrir_novo(self):
+        # Vai reaproveitar a JanelaCadastroVeiculo
+        from views.veiculo_view import JanelaCadastroVeiculo
+        janela_cadastro = JanelaCadastroVeiculo(self)
         
-        self.tree.pack(fill="both", expand=True)
+        # Faz a janela de listagem "esperar" até que a janela de cadastro seja fechada
+        self.wait_window(janela_cadastro)
+        
+        # Recarrega os dados na tabela após o cadastro ser concluído
+        self.carregar_dados()
 
-        self.btn_novo = Button(self.frame_rodape, text="Novo", width=15, command=self.abrir_tela_novo)
-        self.btn_novo.pack(side="left", padx=5)
-
-        self.btn_info = Button(self.frame_rodape, text="Ver Informações", width=15, command=self.ver_informacoes)
-        self.btn_info.pack(side="left", padx=5)
-
-        self.btn_remover = Button(self.frame_rodape, text="Remover", width=15, command=self.remover_selecionado)
-        self.btn_remover.pack(side="left", padx=5)
-
-        self.atualizar_tabela()
-
-
-    def atualizar_tabela(self):
-        for item in self.tree.get_children():
-            self.tree.delete(item)
-
-        for idx, v in enumerate(self.veiculos, start=1):
-            estado_nome = getattr(v.estado_atual, "__class__", type(v.estado_atual)).__name__.replace("State", "")
-            self.tree.insert("", tk.END, iid=str(idx), values=(
-                v.placa,
-                v.__class__.__name__,
-                v.categoria.name,
-                f"R$ {v.taxa_diaria:.2f}",
-                estado_nome
-            ))
-
-    def abrir_tela_novo(self):
-        form = tk.Toplevel(self)
-        form.title("Cadastrar Novo Veículo")
-        form.geometry("380x230")
-        form.resizable(False, False)
-
-        lbl_placa = Label(form, text="Placa:")
-        lbl_placa.grid(row=0, column=0, sticky="w", padx=8, pady=8)
-        txt_placa = Entry(form, width=20)
-        txt_placa.grid(row=0, column=1, padx=8, pady=8)
-
-        lbl_tipo = Label(form, text="Tipo do Veículo:")
-        lbl_tipo.grid(row=1, column=0, sticky="w", padx=8, pady=8)
-        txt_tipo = ttk.Combobox(form, values=["carro", "motorhome"], state="readonly", width=18)
-        txt_tipo.grid(row=1, column=1, padx=8, pady=8)
-        txt_tipo.current(0)
-
-        lbl_cat = Label(form, text="Categoria:")
-        lbl_cat.grid(row=2, column=0, sticky="w", padx=8, pady=8)
-        txt_cat = ttk.Combobox(form, values=["ECONOMICO", "EXECUTIVO"], state="readonly", width=18)
-        txt_cat.grid(row=2, column=1, padx=8, pady=8)
-        txt_cat.current(0)
-
-        lbl_taxa = Label(form, text="Taxa Diária:")
-        lbl_taxa.grid(row=3, column=0, sticky="w", padx=8, pady=8)
-        txt_taxa = Entry(form, width=20)
-        txt_taxa.grid(row=3, column=1, padx=8, pady=8)
-
-        def salvar():
-            placa = txt_placa.get().strip().upper()
-            tipo = txt_tipo.get()
-            categoria = txt_cat.get()
-            taxa = txt_taxa.get().strip().replace(",", ".")
-
-            if not placa or not tipo or not categoria or not taxa:
-                messagebox.showwarning("Aviso", "Por favor, preencha todos os campos.")
-                return
-
-            try:
-                taxa_val = float(taxa)
-                if taxa_val <= 0:
-                    raise ValueError("A taxa deve ser maior que zero.")
-
-                veiculo = VeiculoFactory.criar_veiculo(tipo, placa, taxa_val, Categoria[categoria])
-                self.veiculos.append(veiculo)
-                
-                self.atualizar_tabela()
-                form.destroy()
-                messagebox.showinfo("Sucesso", "Veículo cadastrado com sucesso!")
-
-            except ValueError:
-                messagebox.showerror("Erro", "Insira um valor numérico válido para a taxa diária (ex: 150.50).")
-            except Exception as e:
-                messagebox.showerror("Erro ao Salvar", str(e))
-
-        btn_salvar = Button(form, text="Salvar", width=16, command=salvar)
-        btn_salvar.grid(row=4, column=0, columnspan=2, pady=10)
-
-    def ver_informacoes(self):
-        selecionado = self.tree.focus()
+    def mostrar_info(self):
+        # 1. Verifica qual linha da tabela (Treeview) está selecionada
+        selecionado = self.tree.selection()
+        
+        # 2. Se nenhuma linha foi selecionada, exibe um aviso e cancela a ação (Return)
         if not selecionado:
-            messagebox.showwarning("Aviso", "Por favor, selecione um veículo na tabela primeiro.")
+            messagebox.showwarning("Aviso", "Selecione um veículo para visualizar informações.", parent=self)
             return
-
-        indice = int(selecionado) - 1
-        if 0 <= indice < len(self.veiculos):
-            veiculo = self.veiculos[indice]
             
-            info = veiculo.exibir_dados()
-            messagebox.showinfo("Informações do Veículo", info)
+        # 3. Pega os valores da linha que foi clicada. 
+        # O item['values'][0] é a primeira coluna da tabela (que configuramos para ser a Placa)
+        item = self.tree.item(selecionado[0])
+        placa = item['values'][0]
+            
+        # 4. Trazemos a "lista_veiculos" global, onde todos os objetos de modelo estão salvos.
+        #global lista_veiculos
+        #lista_veiculos = self.controller.listar_veiculos() # Atualiza a lista com os dados mais recentes do banco, para evitar inconsistências
+        
+        veiculo = self.controller.buscar_por_placa(placa) # Atualiza a lista com os dados mais recentes do banco, para evitar inconsistências
+            
+        # 6. Se o veículo foi encontrado na lista de persistência...
+        if veiculo:
+            try:
+                # Chama o método exibir_dados() da classe modelo (Carro/Motorhome) que acabamos de adicionar
+                info = veiculo.exibir_dados()
+            except AttributeError:
+                # Caso a classe do modelo não tenha o método exibir_dados() por alguma razão,
+                # cria uma string básica com as informações para evitar que o código quebre
+                info = f"Placa: {veiculo.placa}\nCategoria: {veiculo.categoria.name}\nTaxa: R$ {veiculo.taxa_diaria:.2f}"
+            
+            # 7. Dispara a Caixa de Diálogo do Windows/Mac (Popup) apresentando no centro da tela as informações obtidas
+            messagebox.showinfo("Informações do Veículo", info, parent=self)
+        else:
+            # 8. Só vai cair aqui se por algum motivo houver erro de inconsistência 
+            # (ex: Constava na tabela mas foi excluído do código/banco localmente).
+            messagebox.showerror("Erro", "Veículo não encontrado.", parent=self)
 
-    def remover_selecionado(self):
-        selecionado = self.tree.focus()
+
+    def remover_veiculo(self):
+        # 1. Verifica qual linha da tabela (Treeview) está selecionada
+        selecionado = self.tree.selection()
+        
+        # 2. Se nenhuma linha foi selecionada, exibe um aviso e cancela a ação (Return)
         if not selecionado:
-            messagebox.showwarning("Aviso", "Por favor, selecione um veículo para remover.")
+            messagebox.showwarning("Aviso", "Selecione um veículo para remover.", parent=self)
             return
 
-
-        resposta = messagebox.askyesno("Confirmar Remoção", "Tem certeza que deseja remover este veículo?")
+        # 3. Pega os valores da linha que foi clicada, com informação da placa - 1º dado da linha
+        item = self.tree.item(selecionado[0])
+        placa = item['values'][0]
+        
+        # 4. Verifica se o usuário quer remover o objeto
+        resposta = messagebox.askyesno("Confirmar Exclusão", f"Tem certeza que deseja remover o veículo de placa {placa}?", parent=self)
         if resposta:
-            indice = int(selecionado) - 1
-            if 0 <= indice < len(self.veiculos):
-                del self.veiculos[indice]
-                self.atualizar_tabela()
+            # 5. Trazemos a "lista_veiculos" global, onde todos os objetos de modelo estão salvos.
+            global lista_veiculos
+            
+            # 6. Removemos o elemento da lista global 
+            # 6.1. Opção 1 - refazer a lista com todos os elementos da lista que não possuam a placa selecionada
+            # lista_veiculos = [v for v in lista_veiculos if v.placa != placa]
+            
+            # 6.2. Opção 2: selecionar o objeto veículo selecionado e remover da lista
+            veiculo = next((v for v in lista_veiculos if v.placa == placa), None)
+            lista_veiculos.remove(veiculo)
+            
+            # 7. Recarregar as informações na tabela
+            self.carregar_dados()
+            messagebox.showinfo("Sucesso", f"O veículo {placa} foi removido com sucesso.", parent=self)
 
-
-if __name__ == "__main__":
-    app = VeiculoDashboard()
-    app.mainloop()
+    def carregar_dados(self):
+        # 1. Limpa todas as linhas atuais da tabela (Treeview) para não duplicar os itens na hora de recarregar
+        for row in self.tree.get_children():
+            self.tree.delete(row)
+            
+        # 2. Resgata a variável global 'lista_veiculos' que age como nossa persistência em memória
+        global lista_veiculos
+        veiculos = self.controller.listar_veiculos() # Atualiza a lista com os dados mais recentes do banco, para evitar inconsistências
+        
+        # 3. Tratamento de segurança: se a lista por acaso for None (nula), avisa o erro
+        if veiculos is None:
+             messagebox.showerror("Erro", "Erro ao carregar veículos.", parent=self)
+             return
+             
+        # 4. Percorre todos os veiculos (objetos Carro e Motorhome) presentes na lista salva
+        for v in veiculos:
+            # Pega dinamicamente o nome da classe do objeto (ex: "Carro" ou "Motorhome")
+            tipo_nome = type(v).__name__
+            
+            # Formata o número float (ex: 150.0) para formato de moeda brasileira em string (ex: "R$ 150,00")
+            taxa_formatada = f"R$ {v.taxa_diaria:.2f}".replace('.', ',')
+            
+            # 5. Insere uma nova linha na Tabela (Treeview). O 'end' diz para colocar no fim da tabela
+            # Os 'values' devem seguir a ordem correta das 4 colunas cadastradas anteriormente:
+            # (Placa, Tipo, Categoria, Taxa Diária)
+            self.tree.insert("", "end", values=(
+                v.placa, 
+                tipo_nome, 
+                v.categoria, 
+                taxa_formatada
+            ))
