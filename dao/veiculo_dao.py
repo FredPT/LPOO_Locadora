@@ -2,8 +2,8 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from model.VeiculoFactory import *
-from model.Veiculo import *
+from model.VeiculoFactory import VeiculoFactory
+from model.Categoria import Categoria
 from dao.db_config import DatabaseConfig
 from dao.generic_dao import GenericDAO
 
@@ -53,7 +53,8 @@ class VeiculoDAO(GenericDAO):
             linhas = cursor.fetchall()
             veiculos = []
             for linha in linhas:
-                obj = VeiculoFactory.criar_veiculo(linha[0], linha[1], float(linha[2]), linha[3])
+                categoria = Categoria(linha[3])
+                obj = VeiculoFactory.criar_veiculo(linha[0], linha[1], float(linha[2]), categoria)
                 veiculos.append(obj)
 
             return veiculos
@@ -65,12 +66,61 @@ class VeiculoDAO(GenericDAO):
             if cursor:
                 cursor.close()
 
+    def remover(self, placa):
+        if not self.conexao:
+            return False, "Não foi possível conectar ao banco de dados."
 
-    def remover(self, id_objeto):
-        pass
+        try:
+            cursor = self.conexao.cursor()
+            query = "DELETE FROM tb_veiculos WHERE vei_placa = %s"
+            cursor.execute(query, (placa.strip().upper(),))
+            if cursor.rowcount == 0:
+                self.conexao.rollback()
+                return False, "Veículo não encontrado para remoção."
+
+            self.conexao.commit()
+            return True, "Veículo removido com sucesso!"
+        except Exception as e:
+            print(f"Erro ao remover veículo {placa}: {e}")
+            self.conexao.rollback()
+            return False, "Erro ao remover veículo."
+        finally:
+            if cursor:
+                cursor.close()
 
     def atualizar(self, objeto):
-        pass
+        if not self.conexao:
+            return False, "Não foi possível conectar ao banco de dados."
+
+        try:
+            cursor = self.conexao.cursor()
+            query = """
+                UPDATE tb_veiculos
+                SET vei_tipo = %s,
+                    vei_categoria = %s,
+                    vei_taxa_diaria = %s
+                WHERE vei_placa = %s
+            """
+            cursor.execute(query, (
+                objeto.__class__.__name__,
+                objeto.categoria.value,
+                objeto.taxa_diaria,
+                objeto.placa
+            ))
+
+            if cursor.rowcount == 0:
+                self.conexao.rollback()
+                return False, "Veículo não encontrado para atualização."
+
+            self.conexao.commit()
+            return True, "Veículo atualizado com sucesso!"
+        except Exception as e:
+            print(f"Erro ao atualizar veículo {objeto.placa}: {e}")
+            self.conexao.rollback()
+            return False, "Erro ao atualizar veículo."
+        finally:
+            if cursor:
+                cursor.close()
 
     def buscar_por_placa(self, placa_str : str):
         if not self.conexao:
@@ -78,11 +128,12 @@ class VeiculoDAO(GenericDAO):
 
         try:
             cursor = self.conexao.cursor()
-            query = "SELECT vei_tipo, vei_placa, vei_taxa_diaria, vei_categoria  FROM tb_veiculos WHERE vei_placa = %s"
+            query = "SELECT vei_tipo, vei_placa, vei_taxa_diaria, vei_categoria FROM tb_veiculos WHERE vei_placa = %s"
             cursor.execute(query, (placa_str.strip().upper(),))
             linha = cursor.fetchone()
             if linha:
-                return VeiculoFactory.criar_veiculo(linha[0], linha[1], float(linha[2]), linha[3])
+                categoria = Categoria(linha[3])
+                return VeiculoFactory.criar_veiculo(linha[0], linha[1], float(linha[2]), categoria)
             return None
         except Exception as e:
             print(f"Erro ao buscar veículo por placa: {e}")
