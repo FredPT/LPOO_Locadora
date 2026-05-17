@@ -168,7 +168,7 @@ Locadora/
 
 ## Declaração de Uso de IA
 
-- [x] **Utilizei IA** como ferramenta de apoio.
+- **Utilizei IA** como ferramenta de apoio.
 - **Ferramenta:** Claude Sonnet 4.6 (Anthropic) — via claude.ai
 - **Finalidade:** Apoio na estruturação e formatação do código seguindo o padrão MVC já adotado no projeto, geração dos scripts SQL de criação das tabelas, auxílio na resolução de erros durante o desenvolvimento e elaboração do README do repositório.
 - **Validação:** Todo o código gerado foi lido, compreendido e testado. As decisões de estrutura e arquitetura foram tomadas com base no conteúdo das aulas e nos requisitos da atividade.
