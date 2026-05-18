@@ -23,12 +23,12 @@ class JanelaPrincipal(tk.Tk):
         self.config(menu=barra_menu)
 
         menu_cadastro = tk.Menu(barra_menu, tearoff=0)
-        barra_menu.add_cascade(label="Cadastro", menu=menu_cadastro)
+        barra_menu.add_cascade(label="   Cadastro   ", menu=menu_cadastro)
         menu_cadastro.add_command(label="Veículos", command=self._abrir_veiculos)
         menu_cadastro.add_command(label="Locações (Admin)", command=self._abrir_locacoes_admin)
 
         menu_acao = tk.Menu(barra_menu, tearoff=0)
-        barra_menu.add_cascade(label="Ação", menu=menu_acao)
+        barra_menu.add_cascade(label="   Ação   ", menu=menu_acao)
         menu_acao.add_command(label="Locar Veículo", command=self._abrir_locacoes_usuario)
 
     def _criar_tela_inicial(self):
