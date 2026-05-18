@@ -60,7 +60,7 @@ class JanelaCadastroLocacao(tk.Toplevel):
 
         frame_botoes = tk.Frame(self)
         frame_botoes.pack(fill="x", padx=20, pady=15)
-        btn_text   = "Atualizar Locação" if self.locacao else "Salvar Locação"
+        btn_text = "Atualizar Locação" if self.locacao else "Salvar Locação"
         btn_action = self.solicitar_atualizacao if self.locacao else self.solicitar_cadastro
         tk.Button(frame_botoes, text=btn_text, width=18, command=btn_action).pack(side="left", padx=5)
         tk.Button(frame_botoes, text="Fechar",  width=10, command=self.destroy).pack(side="right", padx=5)
@@ -74,10 +74,10 @@ class JanelaCadastroLocacao(tk.Toplevel):
         self.cb_estrategia.set(estrategia_str)
 
     def solicitar_cadastro(self):
-        placa      = self.txt_placa.get().strip().upper()
-        data_ini   = self.cal_inicio.get_date().isoformat()
-        data_fim   = self.cal_fim.get_date().isoformat()
-        status     = self.cb_status.get().strip()
+        placa = self.txt_placa.get().strip().upper()
+        data_ini = self.cal_inicio.get_date().isoformat()
+        data_fim = self.cal_fim.get_date().isoformat()
+        status = self.cb_status.get().strip()
         estrategia = self.cb_estrategia.get().strip()
 
         sucesso, msg = self.controller.salvar_locacao_admin(placa, data_ini, data_fim, estrategia, status)
@@ -88,10 +88,10 @@ class JanelaCadastroLocacao(tk.Toplevel):
             messagebox.showerror("Erro", msg, parent=self)
 
     def solicitar_atualizacao(self):
-        placa      = self.txt_placa.get().strip().upper()
-        data_ini   = self.cal_inicio.get_date().isoformat()
-        data_fim   = self.cal_fim.get_date().isoformat()
-        status     = self.cb_status.get().strip()
+        placa = self.txt_placa.get().strip().upper()
+        data_ini = self.cal_inicio.get_date().isoformat()
+        data_fim = self.cal_fim.get_date().isoformat()
+        status = self.cb_status.get().strip()
         estrategia = self.cb_estrategia.get().strip()
 
         sucesso, msg = self.controller.atualizar_locacao_admin(

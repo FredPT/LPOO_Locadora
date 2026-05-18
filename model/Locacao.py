@@ -20,12 +20,12 @@ class Locacao:
         if estrategia is None:
             estrategia = CalculoPadraoStrategy()
 
-        self.id          = id
-        self.veiculo     = veiculo
+        self.id = id
+        self.veiculo = veiculo
         self.data_inicio = data_inicio
-        self.data_fim    = data_fim
-        self.estrategia  = estrategia
-        self.status      = status
+        self.data_fim = data_fim
+        self.estrategia = estrategia
+        self.status = status
 
 
     @property

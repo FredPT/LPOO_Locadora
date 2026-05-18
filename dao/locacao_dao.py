@@ -12,7 +12,7 @@ from model.StatusLocacao import StatusLocacao
 from model.Locacao import Locacao
 
 
-def _estrategia_para_string(estrategia) -> str:
+def _estrategia_para_string(estrategia):
     return "vip" if isinstance(estrategia, CalculoVIPStrategy) else "padrao"
 
 
@@ -112,10 +112,10 @@ class LocacaoDAO(GenericDAO):
             query = """
                 UPDATE tb_locacoes
                 SET loc_placa_veiculo = %s,
-                    loc_data_inicio   = %s,
-                    loc_data_fim      = %s,
-                    loc_status        = %s,
-                    loc_estrategia    = %s
+                    loc_data_inicio = %s,
+                    loc_data_fim = %s,
+                    loc_status = %s,
+                    loc_estrategia = %s
                 WHERE loc_id = %s
             """
             cursor.execute(query, (
@@ -233,10 +233,10 @@ class LocacaoDAO(GenericDAO):
     def _montar_locacao(self, linha):
         (loc_id, placa, data_inicio, data_fim, status_str, estrategia_str, vei_tipo, vei_taxa, vei_cat) = linha
 
-        categoria  = Categoria(vei_cat)
-        veiculo    = VeiculoFactory.criar_veiculo(vei_tipo, placa, float(vei_taxa), categoria)
+        categoria = Categoria(vei_cat)
+        veiculo = VeiculoFactory.criar_veiculo(vei_tipo, placa, float(vei_taxa), categoria)
         estrategia = _string_para_estrategia(estrategia_str)
-        status     = StatusLocacao(status_str)
+        status = StatusLocacao(status_str)
 
         return Locacao(
             veiculo=veiculo,

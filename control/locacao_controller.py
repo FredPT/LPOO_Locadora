@@ -33,12 +33,12 @@ class LocacaoController:
     def buscar_veiculos_disponiveis(self, data_inicio_str: str, data_fim_str: str, categoria_str: str):
         try:
             data_inicio = date.fromisoformat(data_inicio_str)
-            data_fim    = date.fromisoformat(data_fim_str)
+            data_fim = date.fromisoformat(data_fim_str)
             if data_inicio > data_fim:
                 return None, "Data de início deve ser anterior ou igual à data de fim."
 
             categoria = Categoria[categoria_str.upper()]
-            veiculos  = self.locacao_dao.buscar_veiculos_disponiveis(data_inicio, data_fim, categoria.value)
+            veiculos = self.locacao_dao.buscar_veiculos_disponiveis(data_inicio, data_fim, categoria.value)
             return veiculos, None
         except KeyError:
             return None, "Categoria inválida."
@@ -50,7 +50,7 @@ class LocacaoController:
     def salvar_locacao_admin(self, placa: str, data_inicio_str: str, data_fim_str: str, estrategia_str: str, status_str: str):
         try:
             data_inicio = date.fromisoformat(data_inicio_str)
-            data_fim    = date.fromisoformat(data_fim_str)
+            data_fim = date.fromisoformat(data_fim_str)
 
             if data_inicio > data_fim:
                 return False, "Data de início deve ser anterior ou igual à data de fim."
@@ -73,7 +73,7 @@ class LocacaoController:
     def atualizar_locacao_admin(self, id_locacao: int, placa: str, data_inicio_str: str, data_fim_str: str, estrategia_str: str, status_str: str):
         try:
             data_inicio = date.fromisoformat(data_inicio_str)
-            data_fim    = date.fromisoformat(data_fim_str)
+            data_fim = date.fromisoformat(data_fim_str)
 
             if data_inicio > data_fim:
                 return False, "Data de início deve ser anterior ou igual à data de fim."
@@ -83,8 +83,8 @@ class LocacaoController:
                 return False, "Veículo não encontrado."
 
             estrategia = _string_para_estrategia(estrategia_str)
-            status     = StatusLocacao(status_str.strip().lower())
-            locacao    = Locacao(veiculo, data_inicio, data_fim, estrategia, status, id=id_locacao)
+            status = StatusLocacao(status_str.strip().lower())
+            locacao = Locacao(veiculo, data_inicio, data_fim, estrategia, status, id=id_locacao)
 
             return self.locacao_dao.atualizar(locacao)
 
@@ -102,7 +102,7 @@ class LocacaoController:
     def criar_reserva(self, placa: str, data_inicio_str: str, data_fim_str: str):
         try:
             data_inicio = date.fromisoformat(data_inicio_str)
-            data_fim    = date.fromisoformat(data_fim_str)
+            data_fim = date.fromisoformat(data_fim_str)
 
             if data_inicio > data_fim:
                 return False, "Data de início deve ser anterior ou igual à data de fim."

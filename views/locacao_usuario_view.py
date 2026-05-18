@@ -187,7 +187,7 @@ class JanelaLocacaoUsuario(tk.Toplevel):
         status = locacao.status
 
         if status == StatusLocacao.DEVOLVIDO:
-            dias  = (locacao.data_fim - locacao.data_inicio).days or 1
+            dias = (locacao.data_fim - locacao.data_inicio).days or 1
             valor = locacao.calcular_valor_locacao()
             msg = (
                 f"Status: {status.value.capitalize()}\n\n"
@@ -207,7 +207,7 @@ class JanelaLocacaoUsuario(tk.Toplevel):
             )
 
         else:
-            dias  = (locacao.data_fim - locacao.data_inicio).days or 1
+            dias = (locacao.data_fim - locacao.data_inicio).days or 1
             valor = locacao.calcular_valor_locacao()
             msg = (
                 f"Status: {status.value.capitalize()}\n\n"

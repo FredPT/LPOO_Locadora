@@ -13,6 +13,6 @@ class CalculoPadraoStrategy(CalculoLocacaoStrategy):
     
 
 class CalculoVIPStrategy(CalculoLocacaoStrategy):
-    def calcular_diarias(self, veiculo: Veiculo, dias: int) -> float:
+    def calcular_diarias(self, veiculo: Veiculo, dias: int):
         valor_diarias = (veiculo.taxa_diaria * dias) * 0.8
         return (valor_diarias + veiculo.valor_seguro) 

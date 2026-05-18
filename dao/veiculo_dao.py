@@ -122,7 +122,7 @@ class VeiculoDAO(GenericDAO):
             if cursor:
                 cursor.close()
 
-    def buscar_por_placa(self, placa_str : str):
+    def buscar_por_placa(self, placa_str:str):
         if not self.conexao:
             return None
 

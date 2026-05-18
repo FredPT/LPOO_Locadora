@@ -76,7 +76,7 @@ class JanelaListagemLocacoes(tk.Toplevel):
             messagebox.showwarning("Aviso", "Selecione uma locação para editar.", parent=self)
             return
 
-        id_loc  = int(self.tree.item(selecionado[0])["values"][0])
+        id_loc = int(self.tree.item(selecionado[0])["values"][0])
         locacao = self.controller.buscar_por_id(id_loc)
 
         if not locacao:
@@ -93,14 +93,14 @@ class JanelaListagemLocacoes(tk.Toplevel):
             messagebox.showwarning("Aviso", "Selecione uma locação para ver detalhes.", parent=self)
             return
 
-        id_loc  = int(self.tree.item(selecionado[0])["values"][0])
+        id_loc = int(self.tree.item(selecionado[0])["values"][0])
         locacao = self.controller.buscar_por_id(id_loc)
 
         if not locacao:
             messagebox.showerror("Erro", "Locação nao encontrada.", parent=self)
             return
 
-        dias  = (locacao.data_fim - locacao.data_inicio).days or 1
+        dias = (locacao.data_fim - locacao.data_inicio).days or 1
         valor = locacao.calcular_valor_locacao()
         estrategia_str = "VIP" if "vip" in type(locacao.estrategia).__name__.lower() else "Padrao"
 
@@ -123,7 +123,7 @@ class JanelaListagemLocacoes(tk.Toplevel):
             return
 
         id_loc = int(self.tree.item(selecionado[0])["values"][0])
-        placa  = self.tree.item(selecionado[0])["values"][1]
+        placa = self.tree.item(selecionado[0])["values"][1]
 
         resposta = messagebox.askyesno(
             "Confirmar Exclusão",

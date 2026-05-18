@@ -42,7 +42,7 @@ class JanelaCadastroVeiculo(tk.Toplevel):
         self.txt_taxa = tk.Entry(frame_taxa)
         self.txt_taxa.pack(side="right", expand=True, fill="x")
 
-        btn_text   = "Atualizar Veículo" if veiculo else "Salvar Veículo"
+        btn_text = "Atualizar Veículo" if veiculo else "Salvar Veículo"
         btn_action = self.solicitar_atualizacao if veiculo else self.solicitar_cadastro
         tk.Button(self, text=btn_text, command=btn_action).pack(pady=20)
 
@@ -60,10 +60,10 @@ class JanelaCadastroVeiculo(tk.Toplevel):
         self.txt_taxa.insert(0, f"{self.veiculo.taxa_diaria:.2f}".replace('.', ','))
 
     def solicitar_cadastro(self):
-        placa      = self.txt_placa.get().strip().upper()
-        tipo       = self.cb_tipo.get().strip()
-        categoria  = self.cb_categoria.get().strip()
-        taxa_str   = self.txt_taxa.get().strip()
+        placa = self.txt_placa.get().strip().upper()
+        tipo = self.cb_tipo.get().strip()
+        categoria = self.cb_categoria.get().strip()
+        taxa_str = self.txt_taxa.get().strip()
 
         sucesso, msg = self.controller.salvar_veiculo(placa, tipo, categoria, taxa_str)
 
@@ -74,10 +74,10 @@ class JanelaCadastroVeiculo(tk.Toplevel):
             messagebox.showerror("Erro", msg, parent=self)
 
     def solicitar_atualizacao(self):
-        placa      = self.txt_placa.get().strip().upper()
-        tipo       = self.cb_tipo.get().strip()
-        categoria  = self.cb_categoria.get().strip()
-        taxa_str   = self.txt_taxa.get().strip()
+        placa = self.txt_placa.get().strip().upper()
+        tipo = self.cb_tipo.get().strip()
+        categoria = self.cb_categoria.get().strip()
+        taxa_str = self.txt_taxa.get().strip()
 
         sucesso, msg = self.controller.atualizar_veiculo(placa, tipo, categoria, taxa_str)
 

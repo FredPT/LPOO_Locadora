@@ -61,8 +61,8 @@ class JanelaNovaReserva(tk.Toplevel):
 
     def buscar_veiculos(self):
         data_inicio = self.cal_inicio.get_date().isoformat()
-        data_fim    = self.cal_fim.get_date().isoformat()
-        categoria   = self.cb_categoria.get().strip()
+        data_fim = self.cal_fim.get_date().isoformat()
+        categoria = self.cb_categoria.get().strip()
 
         veiculos, erro = self.controller.buscar_veiculos_disponiveis(data_inicio, data_fim, categoria)
         if erro:
@@ -92,9 +92,9 @@ class JanelaNovaReserva(tk.Toplevel):
             messagebox.showwarning("Aviso", "Busque os veículos disponíveis primeiro.", parent=self)
             return
 
-        veiculo     = self._veiculos_disponiveis[selecionado[0]]
+        veiculo = self._veiculos_disponiveis[selecionado[0]]
         data_inicio = self.cal_inicio.get_date().isoformat()
-        data_fim    = self.cal_fim.get_date().isoformat()
+        data_fim = self.cal_fim.get_date().isoformat()
 
         sucesso, msg = self.controller.criar_reserva(veiculo.placa, data_inicio, data_fim)
 
